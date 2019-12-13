@@ -1,67 +1,94 @@
 package service;
 
-import context.DialogContext;
-import model.ActionName;
-import model.BotResponse;
+import javafx.util.Pair;
+import model.Actions;
+import model.StatesList;
+import model.messages.OutgoingMessage;
+import model.messages.IncomingMessage;
 import repository.StateRepository;
-import state.impl.NewState;
+import state.State;
 
-import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 public class MessageHandler {
 
-    private final DialogContext dialogContext;
-
-    public StateHandler getStateHandler() {
-        return stateHandler;
-    }
-
     private final StateHandler stateHandler;
+
     private final StateRepository stateRepository;
-    private final BotResponse botResponse;
 
-
-    public DialogContext getDialogContext() {
-        return dialogContext;
-    }
-
-    public MessageHandler(DialogContext dialogContext, StateRepository stateRepository, StateHandler stateHandler, BotResponse botResponse) {
-        this.dialogContext = dialogContext;
+    public MessageHandler(StateRepository stateRepository, StateHandler stateHandler) {
         this.stateRepository = stateRepository;
         this.stateHandler = stateHandler;
-        this.botResponse = botResponse;
     }
 
-    public BotResponse process(long chatID, String actionName) throws UnsupportedEncodingException {
+    public OutgoingMessage getCurrentStateMessage(long chatId) {
 
-        final byte[] chatIdBytes = String.valueOf(String.valueOf(chatID)).getBytes("UTF-8");
+        State currentState = stateHandler.getCurrentState(chatId);
 
-        if (actionName.equals("/start")) {
-            dialogContext.setState(new NewState());
-            stateRepository.put(chatIdBytes, dialogContext.getState().getStateName().getBytes("UTF-8"));
+        OutgoingMessage outgoingMessage = new OutgoingMessage(chatId);
+        outgoingMessage.setReplyText(currentState.returnText());
+        outgoingMessage.setAvailableActions(currentState.getActionsList());
+        return outgoingMessage;
+    }
+
+    public OutgoingMessage processMessage(IncomingMessage incomingMessage) {
+
+        Pair<String, List<Actions>> returnedContent = processAction(incomingMessage.getChatId(), incomingMessage.getSelectedAction());
+        OutgoingMessage outgoingMessage = new OutgoingMessage(incomingMessage.getChatId(), incomingMessage.getMessageId());
+        outgoingMessage.setReplyText(returnedContent.getKey());
+        outgoingMessage.setAvailableActions(returnedContent.getValue());
+        return outgoingMessage;
+
+    }
+
+    private Pair<String, List<Actions>> processAction(long chatId, String selectedAction) {
+
+        String message;
+        List<Actions> availableActions;
+        State currentState = stateHandler.getCurrentState(chatId);
+        Pair<String, List<Actions>> returnedContent;
+
+        if (selectedAction.equals("/start")) {
+
+            message = StatesList.NEW.getStateInstance().returnText();
+            stateRepository.put(chatId, StatesList.NEW.getStateName());
+            availableActions = (StatesList.NEW.getStateInstance().getActionsList());
+
+        } else if (Actions.isActionInEnum(selectedAction)) {
+
+            returnedContent = processKnownAction(chatId, selectedAction, currentState);
+            message = returnedContent.getKey();
+            availableActions = returnedContent.getValue();
+
+        } else {
+
+            message = "Action doesn't exist";
+            availableActions = currentState.getActionsList();
+
         }
 
-        stateHandler.switchContextState(chatID);
+        returnedContent = new Pair<String, List<Actions>>(message, availableActions);
+        return returnedContent;
+    }
 
-        if (ActionName.isActionInEnum(actionName)) {
+    private Pair<String, List<Actions>> processKnownAction(long chatId, String selectedAction, State currentState) {
 
-            if (!dialogContext.getState().getActionsList().contains(ActionName.valueFromString(actionName))) {
-                botResponse.setReplyText("Action is forbidden right now" + "\n" + dialogContext.returnReplyText());
-            } else {
-                //update user state
-                dialogContext.process(ActionName.valueFromString(actionName));
-                stateRepository.put(chatIdBytes, dialogContext.getState().getStateName().getBytes("UTF-8"));
-                botResponse.setReplyText(dialogContext.returnReplyText());
-            }
+        String message;
 
-        } else if (actionName.equals("/start")) {
-            botResponse.setReplyText(dialogContext.returnReplyText());
-        } else
-            botResponse.setReplyText("Action doesn't exist" + "\n" + dialogContext.returnReplyText());
+        if (!currentState.getActionsList().contains(Actions.valueFromString(selectedAction))) {
 
-        botResponse.setAvailableActions(dialogContext.returnActionNames());
-        return botResponse;
+            message = "Action is forbidden right now";
 
+        } else {
+
+            //update user state
+            currentState = stateHandler.changeStateOnAction(currentState, chatId, selectedAction);
+
+            message = currentState.returnText();
+        }
+
+        Pair<String, List<Actions>> returnedContent = new Pair<String, List<Actions>>(message, currentState.getActionsList());
+        return returnedContent;
     }
 
 }

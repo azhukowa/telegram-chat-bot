@@ -1,62 +1,60 @@
 package bot;
 
-import context.DialogContext;
-import model.ActionName;
-import model.BotResponse;
-import repository.StateRepository;
+import model.Actions;
+import model.messages.OutgoingMessage;
+import model.messages.IncomingMessage;
 import service.MessageHandler;
-import service.StateHandler;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
-public class ConsoleBot {
+public class ConsoleBot implements Bot {
 
     private final MessageHandler messageHandler;
-    private BotResponse botResponse;
-    private StringBuilder text;
+
 
     public ConsoleBot(MessageHandler messageHandler) {
+
         this.messageHandler = messageHandler;
+
+        Thread t = new Thread(() -> {
+            while (true) {
+                Scanner sc = new Scanner(System.in);
+                Random messageId = new Random();
+                reply(messageHandler.getCurrentStateMessage(4));
+                while (true) {
+                    String inputAction = sc.nextLine();
+                    onUpdate(new IncomingMessage(4, inputAction, messageId.nextInt()));
+                }
+            }
+        });
+        t.start();
     }
 
-    public void start() throws UnsupportedEncodingException {
+    @Override
+    public void onUpdate(IncomingMessage incomingMessage) {
 
-        text = new StringBuilder("Welcome to chat. Type 'exit' for exit. \n");
-        messageHandler.getStateHandler().switchContextState(1);
-        text.append(messageHandler.getDialogContext().returnReplyText()).append("\n");
+        if (incomingMessage.getSelectedAction().equalsIgnoreCase("exit")) {
+            System.exit(1);
+            Thread.currentThread().interrupt();
+        } else {
+            reply(messageHandler.processMessage(incomingMessage));
+        }
+    }
+
+    @Override
+    public void reply(OutgoingMessage outgoingMessage) {
+        StringBuilder text = new StringBuilder(outgoingMessage.getReplyText()).append("\n");
         text.append("Available actions:").append("\n");
-        List<ActionName> actionNames = messageHandler.getDialogContext().returnActionNames();
-        if (actionNames != null) {
-            for (ActionName a : actionNames) {
+        List<Actions> actions = outgoingMessage.getAvailableActions();
+        if (actions != null) {
+            for (Actions a : actions) {
                 text.append("--> ").append(a.getActionName()).append("\n");
             }
         }
 
         System.out.println(text.toString());
-
-
-        Scanner sc = new Scanner(System.in);
-        while (true) {
-            String line = sc.nextLine();
-            System.out.println("User: " + line);
-            if (line.equalsIgnoreCase("exit")) {
-                System.exit(1);
-            } else {
-                botResponse = messageHandler.process(1, line);
-                text = new StringBuilder(botResponse.getReplyText()).append("\n");
-                text.append("Available actions:").append("\n");
-                actionNames = botResponse.getAvailableActions();
-                if (actionNames != null) {
-                    for (ActionName a : actionNames) {
-                        text.append("--> ").append(a.getActionName()).append("\n");
-                    }
-                }
-
-                System.out.println(text.toString());
-            }
-        }
     }
 
 }

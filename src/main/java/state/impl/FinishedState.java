@@ -1,17 +1,16 @@
 package state.impl;
 
-import context.DialogContext;
-import model.ActionName;
-import state.State;
+import model.Actions;
+import model.StatesList;
 
 import java.util.ArrayList;
 
 import static java.util.Arrays.asList;
-import static model.ActionName.SAY_HELLO;
+import static model.Actions.SAY_HELLO;
 
-public class FinishedState implements State {
+public class FinishedState implements state.State {
 
-    private ArrayList<ActionName> actionsList = new ArrayList<>(asList(SAY_HELLO));
+    private ArrayList<Actions> actionsList = new ArrayList<>(asList(SAY_HELLO));
 
     @Override
     public String getStateName() {
@@ -25,20 +24,22 @@ public class FinishedState implements State {
     }
 
     @Override
-    public ArrayList<ActionName> getActionsList() {
+    public ArrayList<Actions> getActionsList() {
         return actionsList;
     }
 
 
     @Override
-    public void changeDialogState(DialogContext dialogContext, ActionName actionName) {
+    public state.State changeState(Actions action) {
 
-        switch (actionName) {
+        switch (action) {
             case SAY_HELLO:
-                dialogContext.setState(new NewState());
-                break;
+                return StatesList.NEW.getStateInstance();
         }
 
+        return null;
+
     }
+
 
 }

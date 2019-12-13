@@ -1,35 +1,41 @@
 package service;
 
-import context.DialogContext;
+import model.Actions;
+import model.StatesList;
 import repository.StateRepository;
+import state.State;
 
-import java.io.UnsupportedEncodingException;
 
 public class StateHandler {
 
-    private DialogContext dialogContext;
     private final StateRepository stateRepository;
 
-    public StateHandler(DialogContext dialogContext, StateRepository stateRepository) {
-        this.dialogContext = dialogContext;
+    public StateHandler(StateRepository stateRepository) {
         this.stateRepository = stateRepository;
     }
 
-    public void switchContextState(long chatId) throws UnsupportedEncodingException {
+    public State getCurrentState(long chatId){
 
-        //new user
-        if (stateRepository.get(String.valueOf(chatId).getBytes("UTF-8")) == null) {
-            stateRepository.put(String.valueOf(chatId).getBytes("UTF-8"), dialogContext.getState().getStateName().getBytes("UTF-8"));
+        State currentState;
+
+        if(stateRepository.get(chatId) == null){
+            stateRepository.put(chatId, StatesList.NEW.getStateName());
+            currentState = StatesList.NEW.getStateInstance();
+        }
+        else {
+            byte[] chatState = stateRepository.get(chatId);
+            currentState = StatesList.instanceFromString(new String(chatState));
         }
 
-        //get status from db
-        byte[] chatDbState = stateRepository.get(String.valueOf(chatId).getBytes("UTF-8"));
+        return currentState;
 
-        //if state from db != dialogContext state --> change dialogContext state
-        if (!(new String(chatDbState)).equals(dialogContext.getState().getStateName())) {
-            dialogContext.setState(dialogContext.getStateOnString(new String(chatDbState)));
-        }
     }
 
+
+    public State changeStateOnAction(State currentState, long chatId, String actionText ){
+        State newState = currentState.changeState(Actions.valueFromString(actionText));
+        stateRepository.put(chatId, newState.getStateName());
+        return newState;
+    }
 
 }

@@ -1,7 +1,6 @@
 package state;
 
-import context.DialogContext;
-import model.ActionName;
+import model.Actions;
 
 import java.util.ArrayList;
 
@@ -12,8 +11,8 @@ public interface State {
 
     String returnText();
 
-    ArrayList<ActionName> getActionsList();
+    ArrayList<Actions> getActionsList();
 
-    void changeDialogState(DialogContext dialogContext, ActionName actionName);
+    State changeState(Actions action);
 
 }

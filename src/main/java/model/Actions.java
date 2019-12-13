@@ -1,8 +1,6 @@
 package model;
 
-import java.util.ArrayList;
-
-public enum ActionName {
+public enum Actions {
 
     SAY_HELLO("Start again"),
     WRITE_YES("Yes"),
@@ -11,7 +9,7 @@ public enum ActionName {
 
     private String actionName;
 
-    ActionName(String actionName) {
+    Actions(String actionName) {
         this.actionName = actionName;
     }
 
@@ -21,7 +19,7 @@ public enum ActionName {
 
     //проверка введенной строки на наличие в enum
     public static boolean isActionInEnum(String value) {
-        for (ActionName c : ActionName.values()) {
+        for (Actions c : Actions.values()) {
             if (c.getActionName().equalsIgnoreCase(value)) {
                 return true;
             }
@@ -30,8 +28,8 @@ public enum ActionName {
     }
 
     //поиск значения по строке
-    public static ActionName valueFromString(String text) {
-        for (ActionName action : ActionName.values()) {
+    public static Actions valueFromString(String text) {
+        for (Actions action : Actions.values()) {
             if (action.actionName.equalsIgnoreCase(text)) {
                 return action;
             }
