@@ -1,8 +1,5 @@
 package repository;
 
-import org.rocksdb.RocksDB;
-import org.rocksdb.RocksDBException;
-
 import java.nio.charset.StandardCharsets;
 
 public interface IStateRepository {

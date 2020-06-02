@@ -3,11 +3,8 @@ package repository;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
-<<<<<<< HEAD
 public class RocksDbStateRepository implements IStateRepository {
-=======
-public class RocksDbStateRepository implements StateRepository {
->>>>>>> 24e047ebdea9ddba0781584caaf3a3795619d9db
+
     private final RocksDB db;
 
     public RocksDbStateRepository(RocksDB db) {

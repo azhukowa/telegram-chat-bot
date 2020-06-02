@@ -23,16 +23,4 @@ public class IncomingMessage {
     }
 
 
-//    public void setMessageId(int messageId) {
-//        this.messageId = messageId;
-//    }
-
-//    public void setChatId(long chatId) {
-//        this.chatId = chatId;
-//    }
-
-//    public void setSelectedAction(String selectedAction) {
-//        this.selectedAction = selectedAction;
-//    }
-
 }

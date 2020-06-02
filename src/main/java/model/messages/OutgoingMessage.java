@@ -1,6 +1,6 @@
 package model.messages;
 
-import model.Actions;
+import model.Action;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ public class OutgoingMessage {
 
     private long chatId;
     private String replyText;
-    private List<Actions> availableActions;
+    private List<Action> availableActions;
     private int messageId;
 
     public OutgoingMessage(long chatId) {
@@ -45,11 +45,11 @@ public class OutgoingMessage {
         this.replyText = replyText;
     }
 
-    public List<Actions> getAvailableActions() {
+    public List<Action> getAvailableActions() {
         return availableActions;
     }
 
-    public void setAvailableActions(List<Actions> availableActions) {
+    public void setAvailableActions(List<Action> availableActions) {
         this.availableActions = availableActions;
     }
 }

@@ -1,6 +1,5 @@
 package service;
 
-<<<<<<< HEAD
 import model.Action;
 import repository.IStateRepository;
 import service.api.TestApiHandler;
@@ -11,17 +10,11 @@ import state.impl.TestApiState;
 import state.impl.WeatherApiState;
 
 import java.lang.reflect.InvocationTargetException;
-=======
-import model.Actions;
-import model.StatesList;
-import repository.StateRepository;
-import state.State;
->>>>>>> 24e047ebdea9ddba0781584caaf3a3795619d9db
+
 
 
 public class StateHandler {
 
-<<<<<<< HEAD
     private final TestApiHandler testApiHandler;
     private final WeatherHandler weatherHandler;
     private final IStateRepository stateRepository;
@@ -65,32 +58,14 @@ public class StateHandler {
                 }
             }
 
-=======
-    private final StateRepository stateRepository;
 
-    public StateHandler(StateRepository stateRepository) {
-        this.stateRepository = stateRepository;
-    }
-
-    public State getCurrentState(long chatId){
-
-        State currentState;
-
-        if(stateRepository.get(chatId) == null){
-            stateRepository.put(chatId, StatesList.NEW.getStateName());
-            currentState = StatesList.NEW.getStateInstance();
-        }
-        else {
-            byte[] chatState = stateRepository.get(chatId);
-            currentState = StatesList.instanceFromString(new String(chatState));
->>>>>>> 24e047ebdea9ddba0781584caaf3a3795619d9db
         }
 
         return currentState;
 
     }
 
-<<<<<<< HEAD
+
     public IState changeState(IState currentState, long chatId, String actionText) {
 
         IState newState;
@@ -100,11 +75,6 @@ public class StateHandler {
         else
             newState = currentState.handleStateByText(actionText);
 
-=======
-
-    public State changeStateOnAction(State currentState, long chatId, String actionText ){
-        State newState = currentState.changeState(Actions.valueFromString(actionText));
->>>>>>> 24e047ebdea9ddba0781584caaf3a3795619d9db
         stateRepository.put(chatId, newState.getStateName());
         return newState;
     }

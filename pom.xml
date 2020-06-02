@@ -13,13 +13,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-<<<<<<< HEAD
                     <source>11</source>
                     <target>11</target>
-=======
-                    <source>1.8</source>
-                    <target>1.8</target>
->>>>>>> 24e047ebdea9ddba0781584caaf3a3795619d9db
                 </configuration>
             </plugin>
         </plugins>
@@ -39,7 +34,6 @@
             <version>6.4.6</version>
         </dependency>
 
-<<<<<<< HEAD
         <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -47,8 +41,6 @@
             <version>2.8.6</version>
         </dependency>
 
-=======
->>>>>>> 24e047ebdea9ddba0781584caaf3a3795619d9db
     </dependencies>
 
 </project>
